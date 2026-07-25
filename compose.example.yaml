@@ -1,0 +1,13 @@
+services:
+  nuvio-web:
+    build:
+      context: .
+    image: nateteeples/nuvio-web:latest
+    restart: unless-stopped
+    environment:
+      PORT: ${NUVIO_PORT:-4173}
+    ports:
+      - "${NUVIO_PORT:-4173}:${NUVIO_PORT:-4173}"
+    # To supply API credentials or override runtime URLs:
+    # volumes:
+    #   - ./local.properties:/app/local.properties:ro

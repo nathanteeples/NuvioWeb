@@ -138,6 +138,44 @@ Open:
 http://127.0.0.1:8080
 ```
 
+### Docker
+
+Build and run the production web app in a container:
+
+```bash
+docker build -t nuvio-web .
+docker run --rm -p 4173:4173 nuvio-web
+```
+
+Or run the published image directly:
+
+```bash
+docker run --rm -p 4173:4173 nateteeples/nuvio-web:latest
+```
+
+The container listens on port `4173` by default. Set `PORT` to use a different
+container port and publish the same port from the host:
+
+```bash
+docker run --rm -e PORT=8080 -p 8080:8080 nuvio-web
+```
+
+An example Compose configuration is provided in `compose.example.yaml`:
+
+```bash
+docker compose -f compose.example.yaml up --build
+```
+
+To change the port with Compose:
+
+```bash
+NUVIO_PORT=8080 docker compose -f compose.example.yaml up --build
+```
+
+Runtime API credentials and URL overrides can be supplied by copying
+`local.example.properties` to the ignored `local.properties` file and
+uncommenting the volume mount in `compose.example.yaml`.
+
 ## Project Structure
 
 - `js/` contains app logic, UI screens, platform adapters, and player code.

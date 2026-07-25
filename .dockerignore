@@ -1,0 +1,11 @@
+.git
+.github
+.cache
+.pm2
+dist
+logs
+node_modules
+local.properties
+*.ipk
+*.wgt
+.DS_Store
