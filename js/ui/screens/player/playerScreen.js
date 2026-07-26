@@ -73,6 +73,7 @@ import {
   supportsBitmapSubtitleDecoding,
   warmBitmapSubtitleDecoder
 } from "../../../core/player/bitmapSubtitleDecoder.js";
+import { renderLucideIcon } from "../../icons/lucideIcons.js";
 
 const CLOCK_FORMATTER_CACHE = new Map();
 const LANGUAGE_DISPLAY_NAME_CACHE = new Map();
@@ -8018,8 +8019,7 @@ export const PlayerScreen = {
     const base = [
       {
         action: "playPause",
-        label: this.paused ? ">" : "II",
-        icon: this.paused ? "assets/icons/ic_player_play.svg" : "assets/icons/ic_player_pause.svg",
+        iconName: this.paused ? "play" : "pause",
         title: "Play/Pause",
         primary: true
       }
@@ -8028,30 +8028,26 @@ export const PlayerScreen = {
     if (nextEpisode?.hasAired && !this.nextEpisodeLaunching) {
       base.push({
         action: "playNextEpisode",
-        icon: "assets/icons/ic_player_skip_next.svg",
-        useMask: true,
+        iconName: "skip_next",
         title: t("next_episode_label", {}, "Next episode")
       });
     }
 
-    base.push({ action: "subtitleDialog", icon: "assets/icons/ic_player_subtitles.svg", title: t("subtitle_dialog_title", {}, "Subtitles") });
+    base.push({ action: "subtitleDialog", iconName: "captions", title: t("subtitle_dialog_title", {}, "Subtitles") });
 
     base.push({
       action: "audioTrack",
-      icon: this.selectedAudioTrackIndex >= 0 || this.selectedManifestAudioTrackId
-        ? "assets/icons/ic_player_audio_filled.svg"
-        : "assets/icons/ic_player_audio_outline.svg",
-      useMask: true,
+      iconName: "audio",
       title: t("audio_dialog_title", {}, "Audio")
     });
 
-    base.push({ action: "source", icon: "assets/icons/ic_player_source.svg", title: t("sources_title", {}, "Sources") });
+    base.push({ action: "source", iconName: "source", title: t("sources_title", {}, "Sources") });
 
     if (Array.isArray(uiState.episodesAll) && uiState.episodesAll.length) {
-      base.push({ action: "episodes", icon: "assets/icons/ic_player_episodes.svg", title: t("episodes_panel_title", {}, "Episodes") });
+      base.push({ action: "episodes", iconName: "episodes", title: t("episodes_panel_title", {}, "Episodes") });
     }
 
-    base.push({ action: "more", label: this.moreActionsVisible ? "<" : ">", title: t("player_more_actions_title", {}, "More Actions") });
+    base.push({ action: "more", iconName: this.moreActionsVisible ? "chevron_left" : "more", title: t("player_more_actions_title", {}, "More Actions") });
 
     if (!this.moreActionsVisible) {
       return base;
@@ -8061,8 +8057,8 @@ export const PlayerScreen = {
     return [
       ...base.slice(0, Math.max(0, base.length - 1)),
       { action: "speed", label: `${playbackSpeed.toFixed(playbackSpeed % 1 ? 2 : 0)}x`, title: t("player_playback_speed", {}, "Playback speed") },
-      { action: "aspect", icon: "assets/icons/ic_player_aspect_ratio.svg", title: t("player_more_aspect_ratio", {}, "Aspect Ratio") },
-      { action: "backFromMore", label: "<", title: t("player_go_back", {}, "Back") }
+      { action: "aspect", iconName: "scan", title: t("player_more_aspect_ratio", {}, "Aspect Ratio") },
+      { action: "backFromMore", iconName: "chevron_left", title: t("player_go_back", {}, "Back") }
     ];
   },
 
@@ -8085,10 +8081,8 @@ export const PlayerScreen = {
       <button class="player-control-btn focusable${control.primary ? " is-primary" : ""}"
               data-action="${control.action}"
               title="${escapeHtml(control.title || "")}">
-        ${control.icon
-          ? ((control.primary || control.useMask)
-            ? `<span class="player-control-icon player-control-icon-mask" style="-webkit-mask-image:url('${escapeHtml(control.icon)}');mask-image:url('${escapeHtml(control.icon)}');" aria-hidden="true"></span>`
-            : `<img class="player-control-icon" src="${control.icon}" alt="" aria-hidden="true" />`)
+        ${control.iconName
+          ? renderLucideIcon(control.iconName, "player-control-icon lucide-icon")
           : `<span class="player-control-label">${escapeHtml(control.label || "")}</span>`}
       </button>
     `).join("");
@@ -16615,6 +16609,21 @@ export const PlayerScreen = {
     }
     if (this.nextEpisodeBackExitArmed) {
       this.nextEpisodeBackExitArmed = false;
+    }
+    const isSpaceKey =
+      keyCode === 32 ||
+      String(event?.key || "") === " " ||
+      String(event?.code || "").toLowerCase() === "space";
+    if (isSpaceKey) {
+      event?.preventDefault?.();
+      event?.stopPropagation?.();
+      event?.stopImmediatePropagation?.();
+      if (!event?.repeat && !this.isExternalFrameMode()) {
+        this.autoHideControlsAfterSeek = false;
+        this.togglePause({ focusControls: true });
+        this.renderControlButtons();
+      }
+      return;
     }
     if (keyCode === 37 || keyCode === 38 || keyCode === 39 || keyCode === 40 || isSelectKeyCode(keyCode)) {
       event?.preventDefault?.();

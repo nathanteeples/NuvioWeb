@@ -2255,7 +2255,7 @@ button:focus-visible {
 }
 
 .root-sidebar-icon-material {
-  font-family: "Material Icons";
+  font-family: inherit;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -7023,7 +7023,7 @@ button:focus-visible {
 .settings-nav-icon-material {
   width: 36px;
   height: 36px;
-  font-family: "Material Icons";
+  font-family: inherit;
   font-size: 36px;
   line-height: 1;
   color: currentColor;
@@ -8283,7 +8283,7 @@ button:focus-visible {
   width: 48px; /* ATV 24dp -> 48px */
   height: 48px; /* ATV 24dp -> 48px */
   color: #fff;
-  font-family: "Material Icons";
+  font-family: inherit;
   font-size: 48px; /* ATV 24dp -> 48px */
   line-height: 1;
   display: inline-flex;
@@ -11485,9 +11485,10 @@ html.legacy-webos .debug-console-log-frame {
 
 .player-progress-shell {
   width: 100%;
-  padding: 0;
+  padding: 12px 0;
   outline: none;
-  margin-top: 12px;
+  margin-top: 0;
+  cursor: pointer;
 }
 
 .player-progress-track {
@@ -11563,6 +11564,7 @@ html.legacy-webos .debug-console-log-frame {
   font-size: var(--tv-secondary-text);
   font-weight: 700;
   pointer-events: auto;
+  cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;

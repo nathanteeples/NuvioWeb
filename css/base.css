@@ -1,6 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap");
-@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
-
 :root {
   --bg-color: #0d0d0d;
   --bg-color-rgb: 13 13 13;
@@ -21,7 +18,10 @@
   --focus-color-rgb: 255 255 255;
   --focus-bg: #303030;
   --border-color: #333333;
-  --app-font-family: "Inter", "Segoe UI", Arial, sans-serif;
+  --app-font-family:
+    "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial,
+    sans-serif;
+  --app-ui-scale: 0.5;
   --tv-safe-gutter: 32px;
   --tv-safe-gutter: clamp(28px, 3vw, 56px);
   --tv-safe-gutter-wide: 40px;
@@ -65,11 +65,36 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+html {
+  /* Match the density of a browser set to 50% zoom while retaining a full
+     interactive viewport. Chromium's layout-aware zoom is supported by every
+     TV engine targeted by this project. */
+  zoom: var(--app-ui-scale);
+}
+
 * {
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
   min-width: 0;
   min-height: 0;
+}
+
+.material-icons {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  font-family: inherit !important;
+  font-size: inherit;
+  line-height: 1;
+}
+
+.lucide-icon {
+  display: block;
+  width: 1em;
+  height: 1em;
+  flex: 0 0 auto;
 }
 
 #app {

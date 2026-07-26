@@ -2,9 +2,8 @@ import { ThemeStore } from "../../data/local/themeStore.js";
 import { ThemeColors } from "./themeColors.js";
 
 const FONT_STACKS = {
-  INTER: '"Inter", "Segoe UI", Arial, sans-serif',
-  DM_SANS: '"DM Sans", "Segoe UI", Arial, sans-serif',
-  OPEN_SANS: '"Open Sans", "Segoe UI", Arial, sans-serif'
+  SF_PRO:
+    '"SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif'
 };
 
 // Cached once at module load so the theme can retain its capability fallback.
@@ -154,10 +153,7 @@ export const ThemeManager = {
       document.documentElement.style.setProperty(key, value);
     });
 
-    document.documentElement.style.setProperty(
-      "--app-font-family",
-      FONT_STACKS[String(theme.fontFamily || "INTER").toUpperCase()] || FONT_STACKS.INTER
-    );
+    document.documentElement.style.setProperty("--app-font-family", FONT_STACKS.SF_PRO);
     document.documentElement.style.setProperty("color-scheme", "dark");
 
     if (!SUPPORTS_CSS_VARS) {

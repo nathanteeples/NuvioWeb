@@ -46,9 +46,7 @@ const BACK_DEBOUNCE_MS = 250;
 const TIZEN_PAIRED_BACK_EVENT_WINDOW_MS = 3000;
 
 function getBackInputChannel(event) {
-  return String(event?.type || "").toLowerCase() === "tizenhwkey"
-    ? "tizenhwkey"
-    : "keydown";
+  return String(event?.type || "").toLowerCase() === "tizenhwkey" ? "tizenhwkey" : "keydown";
 }
 
 export const FocusEngine = {
@@ -71,10 +69,10 @@ export const FocusEngine = {
       document.addEventListener("tizenhwkey", this.boundHandleTizenHardwareKey, true);
       window.addEventListener("tizenhwkey", this.boundHandleTizenHardwareKey, true);
     }
+    document.addEventListener("mousemove", this.boundHandlePointerMove, true);
+    document.addEventListener("pointermove", this.boundHandlePointerMove, true);
+    document.addEventListener("click", this.boundHandlePointerClick, true);
     if (Platform.isWebOS()) {
-      document.addEventListener("mousemove", this.boundHandlePointerMove, true);
-      document.addEventListener("pointermove", this.boundHandlePointerMove, true);
-      document.addEventListener("click", this.boundHandlePointerClick, true);
       document.documentElement?.classList?.add("webos-pointer-remote");
       document.body?.classList?.add("webos-pointer-remote");
     }
@@ -82,15 +80,17 @@ export const FocusEngine = {
 
   handleTizenHardwareKey(event) {
     const normalizedEvent = buildNormalizedEvent(event);
-    if (!Platform.isBackEvent({
-      target: normalizedEvent.target,
-      key: normalizedEvent.key,
-      code: normalizedEvent.code,
-      keyName: normalizedEvent.keyName,
-      keyCode: normalizedEvent.keyCode,
-      originalKeyCode: normalizedEvent.originalKeyCode,
-      detail: event?.detail || null
-    })) {
+    if (
+      !Platform.isBackEvent({
+        target: normalizedEvent.target,
+        key: normalizedEvent.key,
+        code: normalizedEvent.code,
+        keyName: normalizedEvent.keyName,
+        keyCode: normalizedEvent.keyCode,
+        originalKeyCode: normalizedEvent.originalKeyCode,
+        detail: event?.detail || null
+      })
+    ) {
       return;
     }
     this.handleBack(event, normalizedEvent);
@@ -106,11 +106,7 @@ export const FocusEngine = {
       this.lastBackHandledChannel !== inputChannel &&
       elapsedSinceHandled < TIZEN_PAIRED_BACK_EVENT_WINDOW_MS
     );
-    if (
-      normalizedEvent.repeat ||
-      elapsedSinceHandled < BACK_DEBOUNCE_MS ||
-      isPairedTizenEvent
-    ) {
+    if (normalizedEvent.repeat || elapsedSinceHandled < BACK_DEBOUNCE_MS || isPairedTizenEvent) {
       normalizedEvent.preventDefault();
       normalizedEvent.stopPropagation();
       normalizedEvent.stopImmediatePropagation();
@@ -268,9 +264,6 @@ export const FocusEngine = {
   },
 
   handlePointerMove(event) {
-    if (!Platform.isWebOS()) {
-      return;
-    }
     this.pendingPointerMoveEvent = event;
     if (this.pointerMoveFrame) {
       return;
@@ -289,9 +282,6 @@ export const FocusEngine = {
   },
 
   processPointerMove(event) {
-    if (!Platform.isWebOS()) {
-      return;
-    }
     const currentScreen = Router.getCurrentScreen();
     currentScreen?.onPointerMove?.(event);
     const target = this.getPointerFocusable(event);
@@ -305,9 +295,6 @@ export const FocusEngine = {
   },
 
   async handlePointerClick(event) {
-    if (!Platform.isWebOS()) {
-      return;
-    }
     const target = this.getPointerFocusable(event);
     if (!target) {
       return;

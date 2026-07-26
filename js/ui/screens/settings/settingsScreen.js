@@ -163,9 +163,7 @@ const THEME_OPTIONS = [
 ];
 
 const FONT_OPTIONS = [
-  { id: "INTER", label: "Inter" },
-  { id: "DM_SANS", label: "DM Sans" },
-  { id: "OPEN_SANS", label: "Open Sans" }
+  { id: "SF_PRO", label: "SF Pro" }
 ];
 
 const APP_LANGUAGE_NATIVE_LABELS = {
@@ -913,7 +911,7 @@ function labelForTheme(themeName) {
 function labelForFont(fontFamily) {
   return (
     FONT_OPTIONS.find((item) => item.id === String(fontFamily || "").toUpperCase())?.label ||
-    "Inter"
+    "SF Pro"
   );
 }
 

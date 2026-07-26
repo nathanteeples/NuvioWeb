@@ -17,6 +17,7 @@ import { warmStreamingLibs } from "./runtime/loadStreamingLibs.js";
 import { Platform } from "./platform/index.js";
 import { LocalStore } from "./core/storage/localStore.js";
 import { I18n } from "./i18n/index.js";
+import { installLucideIconObserver } from "./ui/icons/lucideIcons.js";
 
 (function applyLegacyPatches() {
   const originalGetElementById = document.getElementById;
@@ -68,7 +69,7 @@ function renderFatalError(error) {
     return;
   }
   document.body.innerHTML = `
-    <div style="min-height:100vh;background:#0f1115;color:#f4f7fb;padding:48px;font-family:Arial,sans-serif;">
+    <div style="min-height:100vh;background:#0f1115;color:#f4f7fb;padding:48px;font-family:'SF Pro Display','SF Pro Text',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;">
       <div style="max-width:960px;margin:0 auto;">
         <h1 style="margin:0 0 16px;font-size:42px;">Nuvio TV failed to start</h1>
         <p style="margin:0 0 20px;font-size:20px;color:#c7d0dd;">Startup hit an error before the app UI rendered.</p>
@@ -102,8 +103,7 @@ function applyPerformanceMode() {
   const rootClasses = document.documentElement.classList;
   const modernWebOs = Platform.isWebOS() && getChromiumMajorVersion() >= 120;
   const modernSidebarBlurCapable =
-    !rootClasses.contains("no-backdrop-filter") &&
-    ((!constrained && !legacyTizen) || modernWebOs);
+    !rootClasses.contains("no-backdrop-filter") && ((!constrained && !legacyTizen) || modernWebOs);
   document.documentElement.classList.toggle("performance-constrained", constrained);
   document.body.classList.toggle("performance-constrained", constrained);
   document.documentElement.classList.toggle(
@@ -117,12 +117,7 @@ function applyPerformanceMode() {
   document.body.classList.toggle("legacy-webos38", legacyWebOs38);
   document.documentElement.classList.toggle("legacy-tizen", legacyTizen);
   document.body.classList.toggle("legacy-tizen", legacyTizen);
-  [
-    "no-flex-gap",
-    "no-aspect-ratio",
-    "no-css-math",
-    "no-backdrop-filter"
-  ].forEach((className) => {
+  ["no-flex-gap", "no-aspect-ratio", "no-css-math", "no-backdrop-filter"].forEach((className) => {
     document.body.classList.toggle(className, rootClasses.contains(className));
   });
 }
@@ -183,9 +178,10 @@ async function enterWithLastProfile({ restoreWebOsRoute = false } = {}) {
       console.warn("Stream badge image prerender failed", error);
     });
   }
-  const resumeRoute = restoreWebOsRoute && typeof Router.consumeWebOsResumeRoute === "function"
-    ? Router.consumeWebOsResumeRoute()
-    : null;
+  const resumeRoute =
+    restoreWebOsRoute && typeof Router.consumeWebOsResumeRoute === "function"
+      ? Router.consumeWebOsResumeRoute()
+      : null;
   if (resumeRoute?.route) {
     await Router.navigate(resumeRoute.route, resumeRoute.params || {}, {
       replaceHistory: true,
@@ -345,6 +341,7 @@ function setupWebOsAppLifecycle() {
 async function bootstrapApp() {
   markBootStage("Rendering application shell");
   renderAppShell();
+  installLucideIconObserver();
   appShellRendered = true;
   markBootStage("Initializing TV platform");
   Platform.init();
@@ -388,7 +385,11 @@ async function bootstrapApp() {
             console.warn("Failed to enter with last profile", error);
             ProfileManager.clearActiveProfile();
             if (Router.getCurrent() !== "profileSelection") {
-              Router.navigate("profileSelection", {}, { replaceHistory: true, skipStackPush: true });
+              Router.navigate(
+                "profileSelection",
+                {},
+                { replaceHistory: true, skipStackPush: true }
+              );
             }
           });
           return;

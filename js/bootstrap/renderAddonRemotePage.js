@@ -38,7 +38,9 @@ function clonePrefs(prefs = {}) {
     order: Array.isArray(prefs.order) ? [...prefs.order] : [],
     disabled: Array.isArray(prefs.disabled) ? [...prefs.disabled] : [],
     customTitles:
-      prefs.customTitles && typeof prefs.customTitles === "object" && !Array.isArray(prefs.customTitles)
+      prefs.customTitles &&
+      typeof prefs.customTitles === "object" &&
+      !Array.isArray(prefs.customTitles)
         ? { ...prefs.customTitles }
         : {}
   };
@@ -53,7 +55,7 @@ function createShell() {
           margin: 0;
           background: #000;
           color: #fff;
-          font-family: "Segoe UI", Arial, sans-serif;
+          font-family: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
         }
         .addon-remote-shell {
           min-height: 100vh;

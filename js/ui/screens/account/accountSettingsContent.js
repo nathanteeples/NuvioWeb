@@ -1,4 +1,6 @@
-﻿export class AccountSettingsContent {
+﻿import { renderLucideIcon } from "../../icons/lucideIcons.js";
+
+export class AccountSettingsContent {
   constructor(container) {
     this.container = container;
     this.focusIndex = 0;
@@ -134,7 +136,7 @@
     return `
       <div class="account-settings-card account-settings-card-danger focusable" data-action="logout">
         <div class="account-settings-row">
-          <img class="icon-img" src="assets/icons/ic_chevron_compact_left.png" alt="" aria-hidden="true" />
+          ${renderLucideIcon("logout", "icon-img lucide-icon")}
           <div class="account-settings-title">Sign Out</div>
         </div>
       </div>

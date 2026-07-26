@@ -6,7 +6,7 @@ const DEFAULT_THEME = {
   mode: "dark",
   themeName: "WHITE",
   accentColor: "#ffffff",
-  fontFamily: "INTER",
+  fontFamily: "SF_PRO",
   language: null,
   amoledMode: false,
   amoledSurfacesMode: false
@@ -54,7 +54,8 @@ function normalizeTheme(settings = {}) {
     ...DEFAULT_THEME,
     ...settings,
     themeName,
-    accentColor: normalizedAccent
+    accentColor: normalizedAccent,
+    fontFamily: "SF_PRO"
   };
 }
 
