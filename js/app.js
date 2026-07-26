@@ -101,11 +101,14 @@ function applyPerformanceMode() {
   const legacyWebOs38 = Platform.isWebOS() && webOsMajorVersion > 0 && webOsMajorVersion <= 3;
   const legacyTizen = Platform.isTizen();
   const rootClasses = document.documentElement.classList;
+  const browserUiDensity = Platform.isBrowser();
   const modernWebOs = Platform.isWebOS() && getChromiumMajorVersion() >= 120;
   const modernSidebarBlurCapable =
     !rootClasses.contains("no-backdrop-filter") && ((!constrained && !legacyTizen) || modernWebOs);
   document.documentElement.classList.toggle("performance-constrained", constrained);
   document.body.classList.toggle("performance-constrained", constrained);
+  document.documentElement.classList.toggle("browser-ui-density", browserUiDensity);
+  document.body.classList.toggle("browser-ui-density", browserUiDensity);
   document.documentElement.classList.toggle(
     "modern-sidebar-blur-capable",
     modernSidebarBlurCapable

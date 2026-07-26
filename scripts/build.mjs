@@ -7,6 +7,7 @@ import postcss from "postcss";
 import cssnano from "cssnano";
 import autoprefixer from "autoprefixer";
 import { readAppMetadata, syncVersionFiles } from "./appMetadata.mjs";
+import { browserDensityPlugin } from "./browserDensity.mjs";
 import { compatibilityPolicy } from "./compatibilityPolicy.mjs";
 import { writeRuntimeEnvScriptFile } from "./envProperties.mjs";
 
@@ -369,6 +370,21 @@ function flexGapFallbackPlugin() {
 
 flexGapFallbackPlugin.postcss = true;
 
+function cssPipeline({ browserDensity = false } = {}) {
+  return [
+    postcssGlobalData({ files: [path.join(rootDir, "css", "base.css")] }),
+    autoprefixer({
+      overrideBrowserslist: [`Chrome ${compatibilityPolicy.chromiumVersion}`],
+      grid: "autoplace"
+    }),
+    legacyDeclarationFallbackPlugin(),
+    unsupportedSelectorFallbackPlugin(),
+    flexGapFallbackPlugin(),
+    ...(browserDensity ? [browserDensityPlugin()] : []),
+    cssnano()
+  ];
+}
+
 async function buildCSS() {
   console.log("processing CSS with PostCSS (legacy support)...");
   const cssDir = path.join(rootDir, "css");
@@ -380,20 +396,20 @@ async function buildCSS() {
     const outPath = path.join(distDir, "css", file);
 
     const css = await readFile(cssPath, "utf8");
-    const result = await postcss([
-      postcssGlobalData({ files: [path.join(cssDir, "base.css")] }),
-      autoprefixer({
-        overrideBrowserslist: [`Chrome ${compatibilityPolicy.chromiumVersion}`],
-        grid: "autoplace"
-      }),
-      legacyDeclarationFallbackPlugin(),
-      unsupportedSelectorFallbackPlugin(),
-      flexGapFallbackPlugin(),
-      cssnano()
-    ]).process(css, { from: cssPath, to: outPath });
+    const result = await postcss(cssPipeline()).process(css, { from: cssPath, to: outPath });
+    const browserOutPath = path.join(
+      distDir,
+      "css",
+      file.replace(/\.css$/i, ".browser.css")
+    );
+    const browserResult = await postcss(cssPipeline({ browserDensity: true })).process(css, {
+      from: cssPath,
+      to: browserOutPath
+    });
 
     await mkdir(path.dirname(outPath), { recursive: true });
     await writeFile(outPath, result.css);
+    await writeFile(browserOutPath, browserResult.css);
   }
 }
 

@@ -178,7 +178,7 @@ function renderHeroBackdropImage(display) {
 export function buildModernHomeSizingStyle(layoutPrefs = {}) {
   const baseWidthDp = Math.max(72, Number(layoutPrefs?.posterCardWidthDp ?? 126) || 126);
   const radiusDp = Math.max(0, Number(layoutPrefs?.posterCardCornerRadiusDp ?? 12) || 12);
-  const dpToPx = 2;
+  const dpToPx = Platform.isBrowser() ? 1 : 2;
   const portraitWidth = Math.round(baseWidthDp * 0.84 * 1.08 * dpToPx);
   const portraitHeight = Math.round(baseWidthDp * 1.5 * 0.84 * 1.08 * dpToPx);
   const portraitExpandedWidth = Math.round(portraitHeight * (16 / 9));

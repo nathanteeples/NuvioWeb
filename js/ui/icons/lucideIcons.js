@@ -128,8 +128,16 @@ function renderNode([tagName, attributes = {}]) {
 
 export function renderLucideIcon(name, className = "lucide-icon") {
   const icon = ICONS[String(name || "").trim()] || Settings;
+  const classes = Array.from(
+    new Set(
+      `${String(className || "")} lucide-icon`
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean)
+    )
+  ).join(" ");
   return `
-    <svg class="${escapeAttribute(className)}"
+    <svg class="${escapeAttribute(classes)}"
          viewBox="0 0 24 24"
          fill="none"
          stroke="currentColor"
