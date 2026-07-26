@@ -21,7 +21,6 @@
   --app-font-family:
     "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial,
     sans-serif;
-  --app-ui-scale: 0.5;
   --tv-safe-gutter: 32px;
   --tv-safe-gutter: clamp(28px, 3vw, 56px);
   --tv-safe-gutter-wide: 40px;
@@ -65,13 +64,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-html {
-  /* Match the density of a browser set to 50% zoom while retaining a full
-     interactive viewport. Chromium's layout-aware zoom is supported by every
-     TV engine targeted by this project. */
-  zoom: var(--app-ui-scale);
-}
-
 * {
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
@@ -95,6 +87,15 @@ html {
   width: 1em;
   height: 1em;
   flex: 0 0 auto;
+  fill: none !important;
+  stroke: currentColor;
+}
+
+/* Several legacy icon slots use filled SVG artwork. Lucide is stroke-based,
+   so its child shapes must stay transparent even inside those slots. */
+.lucide-icon * {
+  fill: none !important;
+  stroke: inherit;
 }
 
 #app {

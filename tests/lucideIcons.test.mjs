@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import { renderLucideIcon } from "../js/ui/icons/lucideIcons.js";
@@ -17,4 +18,11 @@ test("falls back to the Lucide settings icon for unknown names", () => {
 
   assert.match(markup, /circle/);
   assert.doesNotMatch(markup, /unknown-icon/);
+});
+
+test("keeps Lucide shapes transparent without scaling the document", async () => {
+  const css = await readFile(new URL("../css/base.css", import.meta.url), "utf8");
+
+  assert.match(css, /\.lucide-icon \*[\s\S]*?fill:\s*none !important/);
+  assert.doesNotMatch(css, /html\s*\{[\s\S]*?\bzoom\s*:/);
 });
