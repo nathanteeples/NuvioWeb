@@ -7016,6 +7016,9 @@ export const HomeScreen = {
     }
     if (!this.boundHomeMouseOverHandler) {
       this.boundHomeMouseOverHandler = (event) => {
+        if (Platform.isBrowser()) {
+          return;
+        }
         const target = event?.target?.closest?.(".home-main .home-content-card.focusable");
         if (!target || !this.container?.contains(target) || target.classList.contains("focused")) {
           return;

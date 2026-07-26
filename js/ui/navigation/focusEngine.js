@@ -1,5 +1,6 @@
 import { Router } from "./router.js";
 import { Platform } from "../../platform/index.js";
+import { shouldFocusPointerOnMove } from "./pointerPolicy.js";
 
 function buildNormalizedEvent(event) {
   const normalizedKey = Platform.normalizeKey(event);
@@ -284,6 +285,9 @@ export const FocusEngine = {
   processPointerMove(event) {
     const currentScreen = Router.getCurrentScreen();
     currentScreen?.onPointerMove?.(event);
+    if (!shouldFocusPointerOnMove(Platform.getName())) {
+      return;
+    }
     const target = this.getPointerFocusable(event);
     if (!target || target === this.lastPointerFocusTarget) {
       return;

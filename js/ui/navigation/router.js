@@ -73,6 +73,21 @@ export const Router = {
   routeReturnBackGuardUntil: 0,
   routeReturnBackGuardNavigationId: 0,
 
+  notifyRouteChange(previousRoute = null) {
+    if (typeof document === "undefined" || typeof CustomEvent !== "function") {
+      return;
+    }
+    document.dispatchEvent(
+      new CustomEvent("nuvio:routechange", {
+        detail: {
+          route: this.current,
+          previousRoute,
+          params: this.currentParams || {}
+        }
+      })
+    );
+  },
+
   routes: {
     home: HomeScreen,
     player: PlayerScreen,
@@ -402,6 +417,7 @@ export const Router = {
       }
     }
     this.persistWebOsResumeRoute(this.current, this.currentParams);
+    this.notifyRouteChange(previousRoute);
   },
 
   async backFromPendingNavigation() {
@@ -464,6 +480,7 @@ export const Router = {
         this.currentParams = {};
         await this.routes.home.mount();
         this.persistWebOsResumeRoute("home", {});
+        this.notifyRouteChange(null);
         return;
       }
 
@@ -489,6 +506,7 @@ export const Router = {
 
     await this.routes[previousRoute].mount(previousParams, navigationContext);
     this.persistWebOsResumeRoute(this.current, this.currentParams);
+    this.notifyRouteChange(null);
   },
 
   getCurrent() {

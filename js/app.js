@@ -18,6 +18,7 @@ import { Platform } from "./platform/index.js";
 import { LocalStore } from "./core/storage/localStore.js";
 import { I18n } from "./i18n/index.js";
 import { installLucideIconObserver } from "./ui/icons/lucideIcons.js";
+import { installBrowserNavigationControls } from "./ui/components/browserNavigationControls.js";
 
 (function applyLegacyPatches() {
   const originalGetElementById = document.getElementById;
@@ -354,6 +355,7 @@ async function bootstrapApp() {
 
   markBootStage("Initializing navigation");
   Router.init();
+  installBrowserNavigationControls();
   PlayerController.init();
 
   FocusEngine.init();

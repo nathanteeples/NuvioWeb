@@ -74,6 +74,10 @@ import {
   warmBitmapSubtitleDecoder
 } from "../../../core/player/bitmapSubtitleDecoder.js";
 import { renderLucideIcon } from "../../icons/lucideIcons.js";
+import {
+  canTogglePlaybackFromPointer,
+  PLAYER_SURFACE_BLOCKED_SELECTOR
+} from "./playerPointerPolicy.js";
 
 const CLOCK_FORMATTER_CACHE = new Map();
 const LANGUAGE_DISPLAY_NAME_CACHE = new Map();
@@ -4594,10 +4598,12 @@ export const PlayerScreen = {
           <div class="player-torrent-overlay-detail"></div>
         </div>
 
+        <div id="playerClickSurface" class="player-click-surface" aria-hidden="true"></div>
         <div id="playerParentalGuide" class="player-parental-guide hidden"></div>
         <div id="playerSkipIntro" class="player-skip-intro hidden"></div>
 
         <div id="playerAspectToast" class="player-aspect-toast hidden"></div>
+        <div id="playerPointerFeedback" class="player-pointer-feedback" aria-hidden="true"></div>
 
         <div id="playerHtmlSubtitles" class="player-html-subtitles hidden" aria-hidden="true"></div>
         <canvas id="playerBitmapSubtitles" class="player-bitmap-subtitles hidden" aria-hidden="true"></canvas>
@@ -4656,6 +4662,7 @@ export const PlayerScreen = {
 
     this.container.appendChild(root);
     this.cachePlayerUiRefs(root);
+    root.addEventListener("click", (event) => this.handlePlayerSurfaceClick(event));
     this.syncPlayerOverlayLayoutState();
     this.bindLoadingLogoFallback();
     if (!this.isExternalFrameMode()) {
@@ -4682,6 +4689,8 @@ export const PlayerScreen = {
       torrentOverlay: uiRoot.querySelector("#playerTorrentOverlay"),
       torrentOverlaySpeed: uiRoot.querySelector("#playerTorrentOverlay .player-torrent-overlay-speed"),
       torrentOverlayDetail: uiRoot.querySelector("#playerTorrentOverlay .player-torrent-overlay-detail"),
+      clickSurface: uiRoot.querySelector("#playerClickSurface"),
+      pointerFeedback: uiRoot.querySelector("#playerPointerFeedback"),
       loadingIdentity: uiRoot.querySelector(".player-loading-identity"),
       loadingLogoStack: uiRoot.querySelector(".player-loading-logo-stack"),
       loadingLogoBase: uiRoot.querySelector(".player-loading-logo-base"),
@@ -16181,6 +16190,56 @@ export const PlayerScreen = {
     }
   },
 
+  showPointerPlaybackFeedback(iconName) {
+    const feedback = this.uiRefs?.pointerFeedback;
+    if (!feedback) {
+      return;
+    }
+    if (this.pointerFeedbackTimer) {
+      clearTimeout(this.pointerFeedbackTimer);
+      this.pointerFeedbackTimer = null;
+    }
+    feedback.innerHTML = renderLucideIcon(iconName, "player-pointer-feedback-icon");
+    feedback.classList.remove("is-visible");
+    void feedback.offsetWidth;
+    feedback.classList.add("is-visible");
+    this.pointerFeedbackTimer = setTimeout(() => {
+      feedback.classList.remove("is-visible");
+      this.pointerFeedbackTimer = null;
+    }, 560);
+  },
+
+  handlePlayerSurfaceClick(event) {
+    if (!canTogglePlaybackFromPointer({
+      isBrowser: Environment.isBrowser(),
+      externalFrame: this.isExternalFrameMode(),
+      loading: this.loadingVisible,
+      startupError: this.isStartupErrorVisible(),
+      dialogOpen: this.isDialogOpen(),
+      stillWatching: this.stillWatchingPromptVisible,
+      seeking: this.seekOverlayVisible,
+      button: event?.button
+    })) {
+      return false;
+    }
+
+    const target = event?.target;
+    if (!(target instanceof Element) || !target.closest("#playerUiRoot")) {
+      return false;
+    }
+    if (target.closest(PLAYER_SURFACE_BLOCKED_SELECTOR)) {
+      return false;
+    }
+
+    const feedbackIcon = this.paused ? "play" : "pause";
+    this.autoHideControlsAfterSeek = false;
+    this.togglePause({ focusControls: false });
+    this.renderControlButtons();
+    this.showPointerPlaybackFeedback(feedbackIcon);
+    event.preventDefault?.();
+    return true;
+  },
+
   syncPointerFocus(target) {
     const skipIntroNode = target?.closest?.("[data-player-pointer-action='skipIntro']");
     if (skipIntroNode && this.isSkipIntroButtonFocusable()) {
@@ -16375,7 +16434,12 @@ export const PlayerScreen = {
 
     const controlButton = target.closest?.(".player-control-btn[data-action]");
     if (controlButton) {
-      this.performControlAction(controlButton.dataset.action || "");
+      const action = controlButton.dataset.action || "";
+      const feedbackIcon = this.paused ? "play" : "pause";
+      this.performControlAction(action);
+      if (action === "playPause") {
+        this.showPointerPlaybackFeedback(feedbackIcon);
+      }
       return true;
     }
 
@@ -17137,6 +17201,10 @@ export const PlayerScreen = {
     if (this.aspectToastTimer) {
       clearTimeout(this.aspectToastTimer);
       this.aspectToastTimer = null;
+    }
+    if (this.pointerFeedbackTimer) {
+      clearTimeout(this.pointerFeedbackTimer);
+      this.pointerFeedbackTimer = null;
     }
 
     if (this.parentalGuideTimer) {
